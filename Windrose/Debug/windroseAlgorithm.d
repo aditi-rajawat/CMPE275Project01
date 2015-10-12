@@ -1,0 +1,1 @@
+windroseAlgorithm.d: ../windroseAlgorithm.cpp
