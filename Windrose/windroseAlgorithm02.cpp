@@ -45,7 +45,7 @@
 //	{
 //		int local_wr[NUM_OF_SECTORS][NUM_OF_SPEED] = {0};
 //		#pragma omp for nowait
-//		for(int i=0; i<10000; i++){
+//		for(int i=0; i<50000; i++){
 //			aggData("Dataset/ACME_2011.csv",local_wr);
 //		}
 //

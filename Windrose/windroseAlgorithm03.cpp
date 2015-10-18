@@ -17,6 +17,7 @@
 //
 //const int NUM_OF_SECTORS = 16;
 //const int NUM_OF_SPEED = 5;
+//const int NUM_OF_MAX_THREADS = 4;
 //
 //struct measurements{
 //	float windSpd;
@@ -36,19 +37,21 @@
 //	double delta;
 //
 //	int wr[NUM_OF_SECTORS][NUM_OF_SPEED]= {0};
-//	int threadNums = omp_get_max_threads();
+//	int __attribute__((aligned(64))) local_wr[NUM_OF_MAX_THREADS][NUM_OF_SECTORS][NUM_OF_SPEED] = {0};
+//
+//	omp_set_num_threads(4);
 //
 //	gettimeofday(&start, NULL);
 //
 //	cout << "Hello world!! \n" << endl;
 //
-//	#pragma omp parallel shared(threadNums)
+//	#pragma omp parallel shared(local_wr)
 //	{
-//		int local_wr[threadNums][NUM_OF_SECTORS][NUM_OF_SPEED] = {0};
+//
 //		int tid = omp_get_thread_num();
 //
-//		#pragma omp for nowait
-//		for(int i=0; i<10000; i++){
+//		#pragma omp for
+//		for(int i=0; i<50000; i++){
 //			aggData("Dataset/ACME_2011.csv",tid, local_wr);
 //		}
 //
