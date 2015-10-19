@@ -22,7 +22,8 @@ using namespace std;
 const int NUM_OF_SECTORS = 16;
 const int NUM_OF_SPEED = 5;
 const int MAX_NUM_DATA_POINTS = pow(2,27); // 2^27 = 134217728
-const int STRIP_WIDTH = 64;
+const int STRIP_WIDTH = 32;
+const int NUM_OF_THREADS = 4;
 
 struct MesoData
 {
@@ -47,7 +48,7 @@ int main(){
 	struct timeval start, end;
 	double delta;
 
-
+	gettimeofday(&start, NULL);
 
 	cout<<"Hello World... I am processing.." << endl << endl;
 
@@ -59,10 +60,23 @@ int main(){
 
 	outputData outData;
 
+	for(int i=0; i<NUM_OF_SECTORS; i++){
+				for(int j=0; j<NUM_OF_SPEED; j++){
+					outData[i][j] = 0;
+				}
+			}
+
 	readData(inputData);
 
-	gettimeofday(&start, NULL);
 	aggData(inputData, outData);
+
+	cout<< "******** Printing 2D Array **********" << endl;
+
+	for(int i=0; i< NUM_OF_SECTORS; i++){
+		for(int j=0; j< NUM_OF_SPEED; j++){
+			cout<< outData[i][j] << "\t";
+		}
+	}
 
 	gettimeofday(&end, NULL);
 	delta = (end.tv_sec  - start.tv_sec) +
@@ -102,9 +116,9 @@ void readData(MesoData & inputData) {
 	double delta;
 
 	gettimeofday(&start, NULL);
-	omp_set_num_threads(4);
+	omp_set_num_threads(NUM_OF_THREADS);
 
-	MesoData mesoArray[4];
+	MesoData mesoArray[NUM_OF_THREADS];
 
 	#pragma omp parallel
 	{
@@ -148,7 +162,7 @@ void readData(MesoData & inputData) {
 	gettimeofday(&end, NULL);
 
 
-	for(int k=0; k< 4; k++){
+	for(int k=0; k< NUM_OF_THREADS; k++){
 		int min;
 		inputData.numDataPoints += mesoArray[k].numDataPoints;
 
@@ -176,7 +190,7 @@ void readData(MesoData & inputData) {
 
 void aggData(MesoData & inputData, outputData & outData){
 
-	omp_set_num_threads(4);
+	omp_set_num_threads(NUM_OF_THREADS);
 
 	cout<<"No. of data points = "<< inputData.numDataPoints << endl;
 
@@ -205,6 +219,7 @@ void aggData(MesoData & inputData, outputData & outData){
 			}
 
 			for(int c=0; c<STRIP_WIDTH; c++){
+				if((D[c]<16 && D[c]>=0) && (S[c]<5 && S[c]>=0))
 				localOutData[D[c]][S[c]]++;
 			}
 		}
@@ -214,6 +229,7 @@ void aggData(MesoData & inputData, outputData & outData){
 				int d = calcDirectBin(inputData.windDir[i]);
 				int s = calcSpeedsBin(inputData.windSpd[i]);
 
+				if((d<16 && d>=0) && (s<5 && s>=0))
 				localOutData[d][s]++;
 		}
 

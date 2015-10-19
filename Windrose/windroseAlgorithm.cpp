@@ -42,7 +42,7 @@
 //	cout << "Hello world!! \n" << endl;
 //
 //
-//	for(int i=0; i<50000; i++){
+//	for(int i=0; i<10; i++){
 //		aggData("Dataset/ACME_2011.csv",wr);
 //	}
 //

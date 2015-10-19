@@ -51,7 +51,7 @@
 //		int tid = omp_get_thread_num();
 //
 //		#pragma omp for
-//		for(int i=0; i<50000; i++){
+//		for(int i=0; i<10; i++){
 //			aggData("Dataset/ACME_2011.csv",tid, local_wr);
 //		}
 //
