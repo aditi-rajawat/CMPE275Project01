@@ -25,7 +25,7 @@
 //{
 //	int maxDataPoints;
 //	int numDataPoints;
-//	int* windDir;
+//	float* windDir;
 //	float* windSpd;
 //};
 //
@@ -33,42 +33,60 @@
 //
 //int calcSpeedsBin(float winSpd);
 //
-//int calcDirectBin(int winDir);
+//int calcDirectBin(float winDir);
 //
-//void readData(MesoData & inputData);
+//void readData(MesoData & inputData, vector<string> List);
 //
 //void aggData(MesoData & inputData, outputData & outData);
+//
+//vector<string> readFileList(string filepath);
 //
 //
 //int main(){
 //	struct timeval start, end;
-//	double delta;
+//		double delta;
 //
-//	gettimeofday(&start, NULL);
+//		gettimeofday(&start, NULL);
+//		cout<<"Hello World... I am processing.." << endl << endl;
 //
-//	cout<<"Hello World... I am processing.." << endl << endl;
+//		string fileListpath = "InputData/2001-2009CSVs/compileList2.txt";
+//		vector<string> vectorOfFilePaths = readFileList(fileListpath);
 //
-//	MesoData inputData = {MAX_NUM_DATA_POINTS,
-//				0,
-//				(int*)calloc(MAX_NUM_DATA_POINTS, sizeof(int)),
-//				(float*)calloc(MAX_NUM_DATA_POINTS, sizeof(float))
-//		};
+//		MesoData inputData = {MAX_NUM_DATA_POINTS,
+//					0,
+//					(float*)calloc(MAX_NUM_DATA_POINTS, sizeof(float)),
+//					(float*)calloc(MAX_NUM_DATA_POINTS, sizeof(float))
+//			};
 //
-//	outputData outData;
+//		outputData outData;
 //
-//	readData(inputData);
+//		for(int i=0; i<NUM_OF_SECTORS; i++){
+//				for(int j=0; j<NUM_OF_SPEED; j++){
+//					outData[i][j] = 0;
+//				}
+//			}
 //
-//	aggData(inputData, outData);
+//		readData(inputData, vectorOfFilePaths);
 //
-//	gettimeofday(&end, NULL);
-//	delta = (end.tv_sec  - start.tv_sec) +
-//		         ((end.tv_usec - start.tv_usec) / 1.e6);
+//		aggData(inputData, outData);
 //
-//	cout<< endl;
-//	printf("%.6lf seconds elapsed\n", delta);
+//		cout<<"******************** Printing final 2D array *******************************"<< endl;
+//		for(int i=0; i<NUM_OF_SECTORS; i++){
+//			for(int j=0; j<NUM_OF_SPEED; j++){
+//				cout<< outData[i][j] << "\t";
+//			}
+//			cout << endl;
+//		}
 //
-//	free(inputData.windDir);
-//	free(inputData.windSpd);
+//		gettimeofday(&end, NULL);
+//		delta = (end.tv_sec  - start.tv_sec) +
+//			         ((end.tv_usec - start.tv_usec) / 1.e6);
+//
+//		cout<< endl;
+//		printf("%.6lf seconds elapsed\n", delta);
+//
+//		free(inputData.windDir);
+//		free(inputData.windSpd);
 //
 //}
 //
@@ -83,7 +101,7 @@
 //	}
 //}
 //
-//int calcDirectBin(int winDir) {
+//int calcDirectBin(float winDir) {
 //	// 0-360 - cut into linear line 0-359
 //	while(winDir<0){
 //
@@ -93,11 +111,11 @@
 //}
 //
 //
-//void readData(MesoData & inputData) {
-//	struct timeval start, end;
-//	double delta;
+//void readData(MesoData & inputData, vector<string> List) {
 //
-//	gettimeofday(&start, NULL);
+//	string path = "InputData/2001-2009CSVs/aggregateData/";
+//	string stationId="A01";
+//
 //	omp_set_num_threads(4);
 //
 //	MesoData mesoArray[4];
@@ -109,41 +127,43 @@
 //
 //		MesoData localInData ={MAX_NUM_DATA_POINTS,
 //				0,
-//				(int*)calloc(MAX_NUM_DATA_POINTS, sizeof(int)),
+//				(float*)calloc(MAX_NUM_DATA_POINTS, sizeof(int)),
 //				(float*)calloc(MAX_NUM_DATA_POINTS, sizeof(float))
 //		};
 //
 //		int tid = omp_get_thread_num();
 //
 //		#pragma omp for
-//		for(int j=0; j<50000; j++){
-//				ifstream inputFile("Dataset/ACME_2011.csv");
-//				getline(inputFile, line);	// ignoring first line of column names
+//		for (int i = 0; i < List.size(); i++) {
+//			ifstream inputFile(path + List[i]);
+//			string rowData[6] ;
+//			string token;
+//			int j = 0;
+//			while (getline(inputFile, line)) {
+//						istringstream lineStream(line);
+//						j = 0;
+//						while (getline(lineStream, token, ',')) {
+//							rowData[j++] = token;
+//						}
 //
-//				while(getline(inputFile, line)){
+//						if(rowData[0] == stationId){
+//							localInData.windDir[count] = strtof(rowData[4].c_str(), NULL);
+//							localInData.windSpd[count] = strtof(rowData[3].c_str(), NULL);
+//							count++;
+//						}
 //
-//					string rowData[6];
-//					istringstream lineStream(line);
-//					string token;
-//					int i=0;
-//					while(getline(lineStream,token,',')){
-//							rowData[i++]=token;
-//					}
-//
-//					localInData.windDir[count] = stoi(rowData[4], NULL);
-//					localInData.windSpd[count] = strtof(rowData[5].c_str(), NULL);
-//
-//					count++;
+//						lineStream.clear();
 //				}
-//			}
+//			inputFile.close();
+//		}
 //
 //		localInData.numDataPoints = count;
 //		mesoArray[tid] = localInData;
 //
 //	}
-//	gettimeofday(&end, NULL);
 //
 //
+//	// adding data into global container from local containers of each thread
 //	for(int k=0; k< 4; k++){
 //		int min;
 //		inputData.numDataPoints += mesoArray[k].numDataPoints;
@@ -163,11 +183,6 @@
 //	}
 //
 //
-//	delta = (end.tv_sec  - start.tv_sec) +
-//			         ((end.tv_usec - start.tv_usec) / 1.e6);
-//
-//	cout<< endl;
-//	printf("%.6lf seconds elapsed in reading the data\n", delta);
 //}
 //
 //void aggData(MesoData & inputData, outputData & outData){
@@ -188,6 +203,7 @@
 //				int d = calcDirectBin(inputData.windDir[i]);
 //				int s = calcSpeedsBin(inputData.windSpd[i]);
 //
+//				if((d<NUM_OF_SECTORS && d>=0) && (s<NUM_OF_SPEED && s>=0))
 //				localOutData[d][s]++;
 //		}
 //
@@ -201,6 +217,16 @@
 //	}
 //}
 //
+//vector<string> readFileList(string filepath) {
+//	vector<string> list;
+//	ifstream inputfile(filepath);
+//	string line;
+//	while (getline(inputfile, line)) {
+//		list.push_back(line);
+//	}
+//	inputfile.close();
+//	return list;
+//}
 //
 //
 //

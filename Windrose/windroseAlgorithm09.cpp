@@ -26,41 +26,62 @@
 //{
 //	int maxDataPoints;
 //	int numDataPoints;
-//	int* windDir;
+//	float* windDir;
 //	float* windSpd;
 //};
 //
 //typedef int outputData[NUM_OF_SECTORS][NUM_OF_SPEED];
 //
+//typedef int swigData[NUM_OF_SECTORS * NUM_OF_SPEED];
+//
 //int calcSpeedsBin(float winSpd);
 //
-//int calcDirectBin(int winDir);
+//int calcDirectBin(float winDir);
 //
-//void readData(MesoData & inputData);
+//void readData(MesoData & inputData, vector<string> List);
 //
 //void aggData(MesoData & inputData, outputData & outData);
+//
+//void convertData(outputData & cData, int pyData[]);
+//
+//vector<string> readFileList(string filepath);
 //
 //
 //int main(){
 //	struct timeval start, end;
 //	double delta;
 //
-//
-//
+//	gettimeofday(&start, NULL);
 //	cout<<"Hello World... I am processing.." << endl << endl;
+//
+//	string fileListpath = "InputData/2001-2009CSVs/compileList2.txt";
+//	vector<string> vectorOfFilePaths = readFileList(fileListpath);
 //
 //	MesoData inputData = {MAX_NUM_DATA_POINTS,
 //				0,
-//				(int*)calloc(MAX_NUM_DATA_POINTS, sizeof(int)),
+//				(float*)calloc(MAX_NUM_DATA_POINTS, sizeof(float)),
 //				(float*)calloc(MAX_NUM_DATA_POINTS, sizeof(float))
 //		};
 //
 //	outputData outData;
 //
-//	readData(inputData);
+//	for(int i=0; i<NUM_OF_SECTORS; i++){
+//			for(int j=0; j<NUM_OF_SPEED; j++){
+//				outData[i][j] = 0;
+//			}
+//		}
 //
-//	gettimeofday(&start, NULL);
+//	readData(inputData, vectorOfFilePaths);
+//
 //	aggData(inputData, outData);
+//
+//	cout<<"******************** Printing final 2D array *******************************"<< endl;
+//	for(int i=0; i<NUM_OF_SECTORS; i++){
+//		for(int j=0; j<NUM_OF_SPEED; j++){
+//			cout<< outData[i][j] << "\t";
+//		}
+//		cout << endl;
+//	}
 //
 //	gettimeofday(&end, NULL);
 //	delta = (end.tv_sec  - start.tv_sec) +
@@ -85,41 +106,44 @@
 //	}
 //}
 //
-//int calcDirectBin(int winDir) {
+//int calcDirectBin(float winDir) {
 //	// 0-360 - cut into linear line 0-359
 //	while(winDir<0){
 //
 //		winDir = winDir + 360;
 //	}
-//	return winDir / NUM_OF_SECTORS;
+//	return (int)(winDir / NUM_OF_SECTORS);
 //}
 //
 //
-//void readData(MesoData & inputData) {
+//void readData(MesoData & inputData, vector<string> List) {
 //
-//	string line;
+//	string line, stationId="A01";
+//	string path = "InputData/2001-2009CSVs/aggregateData/";
 //	int count = 0;
 //
-//	for(int j=0; j<50000; j++){
-//		ifstream inputFile("Dataset/ACME_2011.csv");
-//		getline(inputFile, line);	// ignoring first line of column names
-//
-//		while(getline(inputFile, line)){
-//
-//			string rowData[6];
-//			istringstream lineStream(line);
+//	for (int i = 0; i < List.size(); i++) {
+//			ifstream inputFile(path + List[i]);
+//			string rowData[6] ;
 //			string token;
-//			int i=0;
-//			while(getline(lineStream,token,',')){
-//					rowData[i++]=token;
+//			int j = 0;
+//			while (getline(inputFile, line)) {
+//				istringstream lineStream(line);
+//				j = 0;
+//				while (getline(lineStream, token, ',')) {
+//					rowData[j++] = token;
+//				}
+//
+//				if(rowData[0] == stationId){
+//					inputData.windDir[count] = strtof(rowData[5].c_str(), NULL);
+//					inputData.windSpd[count] = strtof(rowData[4].c_str(), NULL);
+//					count++;
+//				}
+//
+//				lineStream.clear();
 //			}
-//
-//			inputData.windDir[count] = stoi(rowData[4], NULL);
-//			inputData.windSpd[count] = strtof(rowData[5].c_str(), NULL);
-//
-//			count++;
+//			inputFile.close();
 //		}
-//	}
 //
 //	inputData.numDataPoints = count;
 //
@@ -131,10 +155,42 @@
 //		int d = calcDirectBin(inputData.windDir[i]);
 //		int s = calcSpeedsBin(inputData.windSpd[i]);
 //
+//		if((d<NUM_OF_SECTORS && d>=0) && (s<NUM_OF_SPEED && s>=0))
 //		outData[d][s]++;
 //	}
 //
 //}
+//
+//vector<string> readFileList(string filepath) {
+//	vector<string> list;
+//	ifstream inputfile(filepath);
+//	string line;
+//	while (getline(inputfile, line)) {
+//		list.push_back(line);
+//	}
+//	inputfile.close();
+//	return list;
+//}
+//
+//
+//
+//
+//
+//
+//void convertData(outputData & cData, int pyData[]){
+//
+//		for(int i=0; i< NUM_OF_SECTORS; i++){
+//			for(int j=0; j< NUM_OF_SPEED; j++){
+//
+//				pyData[i+j] = cData[i][j];
+//				cout<< pyData[i+j] << "\t";
+//
+//			}
+//		}
+//
+//}
+//
+//
 //
 //
 //

@@ -4,7 +4,11 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../serial.cpp \
 ../test.cpp \
+../test03.cpp \
+../test04.cpp \
+../test2.cpp \
 ../windorseAlgorithm04.cpp \
 ../windroseAlgorithm.cpp \
 ../windroseAlgorithm01.cpp \
@@ -20,7 +24,11 @@ CPP_SRCS += \
 ../windroseAlgorithm12.cpp 
 
 OBJS += \
+./serial.o \
 ./test.o \
+./test03.o \
+./test04.o \
+./test2.o \
 ./windorseAlgorithm04.o \
 ./windroseAlgorithm.o \
 ./windroseAlgorithm01.o \
@@ -36,7 +44,11 @@ OBJS += \
 ./windroseAlgorithm12.o 
 
 CPP_DEPS += \
+./serial.d \
 ./test.d \
+./test03.d \
+./test04.d \
+./test2.d \
 ./windorseAlgorithm04.d \
 ./windroseAlgorithm.d \
 ./windroseAlgorithm01.d \
