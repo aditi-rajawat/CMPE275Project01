@@ -1,0 +1,1 @@
+CopyOfParallel.d: ../CopyOfParallel.cpp

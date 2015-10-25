@@ -4,6 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../CopyOfParallel.cpp \
+../Parallel01.cpp \
+../Parallel02.cpp \
+../Parallel03.cpp \
+../Parallel04.cpp \
+../Parallel05.cpp \
+../Serial02.cpp \
 ../serial.cpp \
 ../test.cpp \
 ../test03.cpp \
@@ -24,6 +31,13 @@ CPP_SRCS += \
 ../windroseAlgorithm12.cpp 
 
 OBJS += \
+./CopyOfParallel.o \
+./Parallel01.o \
+./Parallel02.o \
+./Parallel03.o \
+./Parallel04.o \
+./Parallel05.o \
+./Serial02.o \
 ./serial.o \
 ./test.o \
 ./test03.o \
@@ -44,6 +58,13 @@ OBJS += \
 ./windroseAlgorithm12.o 
 
 CPP_DEPS += \
+./CopyOfParallel.d \
+./Parallel01.d \
+./Parallel02.d \
+./Parallel03.d \
+./Parallel04.d \
+./Parallel05.d \
+./Serial02.d \
 ./serial.d \
 ./test.d \
 ./test03.d \
